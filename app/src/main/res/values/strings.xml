@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BLEAndMQTT</string>
+    <string name="ble_not_supported">BLE not supported by this device</string>
+    <string name="ble_required">Ble required to proceed</string>
+    <string name="ble_name_not_available">Device name not available</string>
+    <string name="permission_required">Permission required for scanning BLE devices</string>
+    <string name="send_data">Send Data</string>
+</resources>
