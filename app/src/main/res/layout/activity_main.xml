@@ -1,26 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/refreshBle"
         android:layout_width="match_parent"
-        android:padding="10dp"
-        android:orientation="vertical"
-        android:weightSum="1"
-        android:layout_height="match_parent"
-        tools:context=".activities.MainActivity">
-
-    <android.support.v7.widget.RecyclerView
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            android:id="@+id/rvBleDevices"
+        android:layout_height="match_parent">
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_weight=".9"
-            android:layout_height="0dp"/>
+            android:layout_height="match_parent">
+        <LinearLayout
+                android:id="@+id/llData"
+                android:layout_width="match_parent"
+                android:padding="10dp"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:layout_height="match_parent"
+                tools:context=".activities.MainActivity">
 
-    <Button
-            android:id="@+id/btnSendData"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/send_data"
-            android:layout_weight=".1"/>
-</LinearLayout>
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:text="@string/ble_devices"
+                    android:layout_weight=".1"/>
+            <android.support.v7.widget.RecyclerView
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                    android:id="@+id/rvBleDevices"
+                    android:layout_width="match_parent"
+                    android:layout_weight=".8"
+                    android:layout_height="0dp"/>
+
+            <Button
+                    android:id="@+id/btnSendData"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:text="@string/send_data"
+                    android:layout_weight=".1"/>
+        </LinearLayout>
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/llNoData"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                    android:textSize="18sp"
+                    android:text="@string/no_devices_found"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <TextView
+                    android:layout_marginTop="10dp"
+                    android:textSize="14sp"
+                    android:text="@string/pull_to_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

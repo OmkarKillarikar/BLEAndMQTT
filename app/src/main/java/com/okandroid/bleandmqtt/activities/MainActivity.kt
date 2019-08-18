@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import com.google.gson.Gson
 import com.okandroid.bleandmqtt.R
@@ -28,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     private fun PackageManager.missingSystemFeature(name: String): Boolean = !hasSystemFeature(name)
     private var bleDeviceAdapter: BleDevicesAdapter? = null
 
-
     private val bluetoothAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE) {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
@@ -38,13 +38,28 @@ class MainActivity : AppCompatActivity() {
 
     private val bleBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent != null && intent.hasExtra(Constants.IntentExtras.BLE_DEVICE)) {
-                val bleDevice = intent.getSerializableExtra(Constants.IntentExtras.BLE_DEVICE) as BleDevice
-                if (bleDevice != null) {
-                    if (bleDeviceAdapter?.isDeviceAlreadyFound(bleDevice) == false) {
-                        bleDeviceAdapter?.bleDevices?.add(bleDevice)
+            if (intent != null) {
+                when {
+                    intent.hasExtra(Constants.IntentExtras.BLE_DEVICE) -> {
+                        val bleDevice = intent.getSerializableExtra(Constants.IntentExtras.BLE_DEVICE) as BleDevice
+                        if (bleDevice != null) {
+                            if (bleDeviceAdapter?.isDeviceAlreadyFound(bleDevice) == false) {
+                                bleDeviceAdapter?.bleDevices?.add(bleDevice)
+                            }
+                            bleDeviceAdapter?.notifyDataSetChanged()
+                        }
                     }
-                    bleDeviceAdapter?.notifyDataSetChanged()
+                    intent.hasExtra(Constants.IntentExtras.SCAN_FINISHED) -> {
+                        if (refreshBle.isRefreshing) refreshBle.isRefreshing = false
+
+                        if (bleDeviceAdapter?.bleDevices?.size == 0) {
+                            llNoData.visibility = View.VISIBLE
+                            llData.visibility = View.GONE
+                        } else {
+                            llNoData.visibility = View.GONE
+                            llData.visibility = View.VISIBLE
+                        }
+                    }
                 }
             }
         }
@@ -80,15 +95,21 @@ class MainActivity : AppCompatActivity() {
                 mqttUtil?.publishMessage(gson.toJson(bleDevice))
             }
         }
+        refreshBle.setOnRefreshListener {
+            initBLEScan()
+        }
     }
 
     private fun initBLEScan() {
         packageManager.takeIf { it.missingSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE) }?.also {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_LONG).show()
             finish()
         }
 
         if (bluetoothAdapter?.isEnabled == true) {
+            refreshBle.isRefreshing = true
+            bleDeviceAdapter?.bleDevices?.clear()
             startBleService()
         } else {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -126,8 +147,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startBleService() {
-        val startScan = Intent(this, BleScanService::class.java)
-        startService(startScan)
+        try {
+            val startScan = Intent(this, BleScanService::class.java)
+            startService(startScan)
+        } catch (e: Exception) {
+
+        }
     }
 
     override fun onResume() {
@@ -137,13 +162,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        super.onPause()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(bleBroadcastReceiver)
+        super.onPause()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        mqttUtil?.disonnect()
+        mqttUtil?.disconnect()
         stopService(Intent(this, BleScanService::class.java))
+        super.onDestroy()
     }
 }

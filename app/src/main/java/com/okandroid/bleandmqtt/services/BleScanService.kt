@@ -38,6 +38,9 @@ class BleScanService : Service() {
     private fun scanLeDevice() {
         handler.postDelayed({
             bluetoothAdapter?.stopLeScan(scanCallback)
+            val scanFinished = Intent(Constants.BLE_INTENT_FILTER)
+            scanFinished.putExtra(Constants.IntentExtras.SCAN_FINISHED,true)
+            broadcastData(scanFinished)
         }, Constants.SCAN_PERIOD)
 //        bluetoothAdapter?.startLeScan(arrayOf(UUID.fromString("00001803-0000-1000-8000-00805F9B34FB")), scanCallback)
         bluetoothAdapter?.startLeScan(scanCallback)
@@ -54,12 +57,15 @@ class BleScanService : Service() {
                 rssi = rssi.toString()
             )
         )
+        broadcastData(payload)
 
+    }
+
+    private fun broadcastData(payload: Intent) {
         LocalBroadcastManager.getInstance(this@BleScanService).sendBroadcast(payload)
     }
 
     private fun startForegroundService() {
-        val intent = Intent()
         val channelId = "com.example.simpleapp"
         val channelName = "My Background Service"
 

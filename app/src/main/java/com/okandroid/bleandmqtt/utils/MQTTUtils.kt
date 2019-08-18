@@ -6,18 +6,19 @@ import android.widget.Toast
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
-class MQTTUtils private constructor(val context: Context) {
-
-
+class MQTTUtils private constructor(private val context: Context) {
 
     private var mqttAndroidClient: MqttAndroidClient? = null
-    private val mqttServerUri: String = "tcp://soldier.cloudmqtt.com:17187"
-    val publishTopic: String = "bleData"
-    var clientId: String = "testAndroidClient"
+
+    object MQQTTConstants {
+        const val mqttServerUri: String = "tcp://soldier.cloudmqtt.com:17187"
+        const val publishTopic: String = "bleData"
+        const val clientId: String = "testAndroidClient"
+    }
 
     init {
 
-        mqttAndroidClient = MqttAndroidClient(context, mqttServerUri, clientId)
+        mqttAndroidClient = MqttAndroidClient(context, MQQTTConstants.mqttServerUri, MQQTTConstants.clientId)
         mqttAndroidClient?.setCallback(object : MqttCallbackExtended {
 
             override fun connectComplete(reconnect: Boolean, serverURI: String) {
@@ -83,10 +84,10 @@ class MQTTUtils private constructor(val context: Context) {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun disonnect() {
+    fun disconnect() {
         mqttAndroidClient?.disconnect()
     }
 
@@ -94,7 +95,7 @@ class MQTTUtils private constructor(val context: Context) {
         try {
             val mqttMessage = MqttMessage()
             mqttMessage.payload = message.toByteArray()
-            mqttAndroidClient?.publish(publishTopic, mqttMessage)
+            mqttAndroidClient?.publish(MQQTTConstants.publishTopic, mqttMessage)
             if (mqttAndroidClient?.isConnected == true) {
 
             } else {

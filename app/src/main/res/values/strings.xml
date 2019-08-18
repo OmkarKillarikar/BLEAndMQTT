@@ -5,4 +5,7 @@
     <string name="ble_name_not_available">Device name not available</string>
     <string name="permission_required">Permission required for scanning BLE devices</string>
     <string name="send_data">Send Data</string>
+    <string name="no_devices_found">No devices found</string>
+    <string name="pull_to_refresh">Pull to refresh</string>
+    <string name="ble_devices">BLE Devices</string>
 </resources>

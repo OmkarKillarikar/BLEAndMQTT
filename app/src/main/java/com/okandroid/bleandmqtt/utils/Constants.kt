@@ -10,6 +10,7 @@ object Constants {
 
     object IntentExtras {
         const val BLE_DEVICE = "BLE_DEVICE"
+        const val SCAN_FINISHED = "SCAN_FINISHED"
     }
 
     object PermissionRequestCode {

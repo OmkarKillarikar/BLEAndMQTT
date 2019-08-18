@@ -2,7 +2,8 @@ package com.okandroid.bleandmqtt.adapters
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.text.TextUtils
+import android.text.SpannableString
+import android.text.style.RelativeSizeSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,17 +36,14 @@ class BleDevicesAdapter(private val context: Context) : RecyclerView.Adapter<Ble
     }
 
     override fun onBindViewHolder(holder: BleDeviceViewHolder, position: Int) {
-        if (TextUtils.isEmpty(bleDevices[position].name)) {
-            holder.tvName.text = context.getString(R.string.ble_name_not_available)
-        } else {
-            holder.tvName.text = bleDevices[position].name
-        }
-
         holder.tvAddress.text = bleDevices[position].address
+        val spanString = SpannableString(bleDevices[position].rssi + "dBm")
+        spanString.setSpan(RelativeSizeSpan(1.5f), 0, spanString.length - 3, 0)
+        holder.tvRssi.text = spanString
     }
 
     class BleDeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvName = itemView.findViewById<TextView>(R.id.tvBleDeviceName)!!
+        val tvRssi = itemView.findViewById<TextView>(R.id.tvRssi)!!
         val tvAddress = itemView.findViewById<TextView>(R.id.tvAddress)!!
     }
 }
